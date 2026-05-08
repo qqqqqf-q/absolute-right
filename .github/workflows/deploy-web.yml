@@ -50,7 +50,7 @@ jobs:
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: web
           packageManager: pnpm
-          command: d1 migrations apply maleme-leaderboard --remote
+          command: d1 migrations apply absolute-right-leaderboard --remote
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3

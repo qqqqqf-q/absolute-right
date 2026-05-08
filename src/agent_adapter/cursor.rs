@@ -240,7 +240,8 @@ fn read_messages_from_db(db_path: &Path) -> Result<Vec<UserMessage>, AdapterErro
 
         for tab in chat_data.tabs {
             for bubble in tab.bubbles {
-                if bubble.bubble_type == "user" {
+                let is_assistant = bubble.bubble_type == "assistant";
+                if bubble.bubble_type == "user" || is_assistant {
                     let text = trim_to_owned(&bubble.text.into_string());
 
                     if !text.is_empty() {
@@ -249,6 +250,7 @@ fn read_messages_from_db(db_path: &Path) -> Result<Vec<UserMessage>, AdapterErro
                             model: None,
                             text,
                             time: tab.last_send_time,
+                            is_assistant,
                         });
                     }
                 }
@@ -306,7 +308,8 @@ fn read_messages_from_global_db(db_path: &Path) -> Result<Vec<UserMessage>, Adap
 
         if !composer.conversation.is_empty() {
             for (index, bubble) in composer.conversation.into_iter().enumerate() {
-                if bubble.bubble_type != 1 {
+                let is_assistant = bubble.bubble_type == 2;
+                if bubble.bubble_type != 1 && bubble.bubble_type != 2 {
                     continue;
                 }
 
@@ -320,6 +323,7 @@ fn read_messages_from_global_db(db_path: &Path) -> Result<Vec<UserMessage>, Adap
                     model: model.clone(),
                     text,
                     time: base_time + index as i64,
+                    is_assistant,
                 });
             }
             continue;
@@ -330,7 +334,8 @@ fn read_messages_from_global_db(db_path: &Path) -> Result<Vec<UserMessage>, Adap
             .into_iter()
             .enumerate()
         {
-            if header.bubble_type != 1 {
+            let is_assistant = header.bubble_type == 2;
+            if header.bubble_type != 1 && header.bubble_type != 2 {
                 continue;
             }
 
@@ -349,6 +354,7 @@ fn read_messages_from_global_db(db_path: &Path) -> Result<Vec<UserMessage>, Adap
                 model: model.clone(),
                 text,
                 time: base_time + index as i64,
+                is_assistant,
             });
         }
     }
@@ -647,11 +653,15 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(messages.len(), 2);
+        assert_eq!(messages.len(), 3);
         assert_eq!(messages[0].text, "first");
+        assert!(!messages[0].is_assistant);
         assert_eq!(messages[0].time, 1736258828015);
         assert_eq!(format!("{:?}", messages[0].adapter), "Cursor");
-        assert_eq!(messages[1].text, "second");
+        assert_eq!(messages[1].text, "skip");
+        assert!(messages[1].is_assistant);
+        assert_eq!(messages[2].text, "second");
+        assert!(!messages[2].is_assistant);
     }
 
     #[tokio::test]
@@ -747,19 +757,28 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(messages.len(), 2);
+        assert_eq!(messages.len(), 3);
         assert_eq!(messages[0].text, "first");
+        assert!(!messages[0].is_assistant);
         assert_eq!(
             messages[0].model.as_deref(),
             Some("claude-4.5-sonnet-thinking")
         );
         assert_eq!(messages[0].time, 1_735_800_794_838);
-        assert_eq!(messages[1].text, "second");
+        assert_eq!(messages[1].text, "skip");
+        assert!(messages[1].is_assistant);
         assert_eq!(
             messages[1].model.as_deref(),
             Some("claude-4.5-sonnet-thinking")
         );
-        assert_eq!(messages[1].time, 1_735_800_794_840);
+        assert_eq!(messages[1].time, 1_735_800_794_839);
+        assert_eq!(messages[2].text, "second");
+        assert!(!messages[2].is_assistant);
+        assert_eq!(
+            messages[2].model.as_deref(),
+            Some("claude-4.5-sonnet-thinking")
+        );
+        assert_eq!(messages[2].time, 1_735_800_794_840);
     }
 
     #[tokio::test]
@@ -802,11 +821,13 @@ mod tests {
 
         assert_eq!(messages.len(), 2);
         assert_eq!(messages[0].text, "hello");
+        assert!(!messages[0].is_assistant);
         assert_eq!(
             messages[0].model.as_deref(),
             Some("claude-4.5-sonnet-thinking")
         );
         assert_eq!(messages[1].text, "world");
+        assert!(!messages[1].is_assistant);
         assert_eq!(
             messages[1].model.as_deref(),
             Some("claude-4.5-sonnet-thinking")

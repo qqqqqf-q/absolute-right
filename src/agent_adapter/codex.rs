@@ -233,12 +233,17 @@ fn parse_session_file(
                 .and_then(|payload| payload.get("type"))
                 .and_then(serde_json::Value::as_str)
                 == Some("message")
-            && raw
+        {
+            let role = raw
                 .get("payload")
                 .and_then(|payload| payload.get("role"))
-                .and_then(serde_json::Value::as_str)
-                == Some("user")
-        {
+                .and_then(serde_json::Value::as_str);
+
+            if role != Some("user") && role != Some("assistant") {
+                continue;
+            }
+            let is_assistant = role == Some("assistant");
+
             // Skip lines with missing/invalid timestamp instead of failing
             let Some(timestamp) = raw.get("timestamp").and_then(|v| v.as_str()) else {
                 continue;
@@ -265,16 +270,24 @@ fn parse_session_file(
                         model: current_model.clone(),
                         text,
                         time: (datetime.unix_timestamp_nanos() / 1_000_000) as i64,
+                        is_assistant,
                     });
-                    pending_message_indexes.push(messages.len() - 1);
+                    if !is_assistant {
+                        pending_message_indexes.push(messages.len() - 1);
+                    }
                 }
             }
             continue;
         }
 
-        if line_type == Some("message")
-            && raw.get("role").and_then(serde_json::Value::as_str) == Some("user")
-        {
+        if line_type == Some("message") {
+            let role = raw.get("role").and_then(serde_json::Value::as_str);
+
+            if role != Some("user") && role != Some("assistant") {
+                continue;
+            }
+            let is_assistant = role == Some("assistant");
+
             let content = raw
                 .get("content")
                 .and_then(serde_json::Value::as_array)
@@ -293,6 +306,7 @@ fn parse_session_file(
                         model: current_model.clone(),
                         text,
                         time: legacy_timestamp_ms,
+                        is_assistant,
                     });
                 }
             }
@@ -558,14 +572,20 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(messages.len(), 2);
+        assert_eq!(messages.len(), 3);
         assert_eq!(format!("{:?}", messages[0].adapter), "Codex");
         assert_eq!(messages[0].model.as_deref(), Some("gpt-5.4"));
         assert_eq!(messages[0].text, "hello");
         assert_eq!(messages[0].time, 1_776_082_808_985);
+        assert!(!messages[0].is_assistant);
         assert_eq!(messages[1].model.as_deref(), Some("gpt-5.4"));
-        assert_eq!(messages[1].text, "legacy");
-        assert_eq!(messages[1].time, 1_756_748_504_550);
+        assert_eq!(messages[1].text, "ignore");
+        assert_eq!(messages[1].time, 1_776_082_810_000);
+        assert!(messages[1].is_assistant);
+        assert_eq!(messages[2].model.as_deref(), Some("gpt-5.4"));
+        assert_eq!(messages[2].text, "legacy");
+        assert_eq!(messages[2].time, 1_756_748_504_550);
+        assert!(!messages[2].is_assistant);
     }
 
     #[tokio::test]

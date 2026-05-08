@@ -33,6 +33,7 @@ pub struct UserMessage {
     pub model: Option<String>,
     pub text: String,
     pub time: i64,
+    pub is_assistant: bool,
 }
 
 pub type UserMessageStream = Pin<Box<dyn Stream<Item = Result<UserMessage, AdapterError>> + Send>>;

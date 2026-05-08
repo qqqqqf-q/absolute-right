@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "maleme-leaderboard",
+	"name": "absolute-right-leaderboard",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"compatibility_date": "2026-04-13",
 	"workers_dev": false,
@@ -9,15 +9,11 @@
 		"directory": "./dist"
 	},
 	"vars": {
-		"APP_URL": "https://leaderboard.sbai.uk"
+		"APP_URL": "https://leaderboard.absolute-right.dev"
 	},
 	"routes": [
 		{
-			"pattern": "leaderboard.sbai.uk",
-			"custom_domain": true
-		},
-		{
-			"pattern": "taluo.sbai.uk",
+			"pattern": "leaderboard.absolute-right.dev",
 			"custom_domain": true
 		}
 	],
@@ -27,8 +23,8 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "maleme-leaderboard",
-			"database_id": "fa1daa02-315c-45b4-852a-ea03d01d76e0"
+			"database_name": "absolute-right-leaderboard",
+			"database_id": "REPLACE_WITH_D1_DATABASE_ID"
 		}
 	]
 }

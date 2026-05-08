@@ -14,7 +14,7 @@ export const GET: APIRoute = ({ cookies, redirect, url }) => {
   }
 
   const state = crypto.randomUUID();
-  cookies.set("maleme_oauth_state", state, {
+  cookies.set("absolute_right_oauth_state", state, {
     httpOnly: true,
     maxAge: 600,
     path: "/",

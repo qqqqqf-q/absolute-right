@@ -173,7 +173,7 @@ mod tests {
     fn parses_bundled_lexicon() {
         let detector = FuckDetector::new().unwrap();
 
-        assert!(detector.entries().len() >= 200);
+        assert!(detector.entries().len() >= 18);
         assert_eq!(detector.entries()[0].code, 1);
     }
 

@@ -25,8 +25,8 @@ const sbaiStatus = getSbaiStatus(report?.sbai ?? 0, locale);
 const title = profile ? `${profile.displayName} - ${t.leaderboard.pageTitle}` : t.leaderboard.pageTitle;
 const description = profile
   ? locale === "zh-CN"
-    ? `${profile.displayName} 的 maleme 报告`
-    : `${profile.displayName}'s maleme profanity report`
+    ? `${profile.displayName} 的 absolute-right 报告`
+    : `${profile.displayName}'s absolute-right report`
   : t.leaderboard.pageDescription;
 const headlineHtml = report
   ? getReportHeadlineHtml(report.rangeStart, report.rangeEnd, report.profanityCount, locale)
@@ -35,8 +35,8 @@ const shareUrl = profile ? new URL(getSharePath(profile.githubId), getAppUrl(Ast
 const twitterShareUrl = profile
   ? buildTwitterIntentUrl(
     locale === "zh-CN"
-      ? `${profile.displayName} 在 maleme 排行榜排第 ${profile.rank} 名，SBAI ${report?.sbai.toFixed(3) ?? "0.000"}`
-      : `${profile.displayName} is ranked #${profile.rank} on the maleme leaderboard with SBAI ${report?.sbai.toFixed(3) ?? "0.000"}`,
+      ? `${profile.displayName} 在 absolute-right 排行榜排第 ${profile.rank} 名，ARI ${report?.sbai.toFixed(3) ?? "0.000"}`
+      : `${profile.displayName} is ranked #${profile.rank} on the absolute-right leaderboard with ARI ${report?.sbai.toFixed(3) ?? "0.000"}`,
     shareUrl,
   )
   : "";

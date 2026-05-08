@@ -1,5 +1,5 @@
 use indicatif::{ProgressBar, ProgressStyle};
-use maleme::{
+use absolute_right::{
     AgentAdapter, ClaudeAdapter, CodexAdapter, CursorAdapter, FuckDetector, OpenCodeAdapter,
     write_report_and_open,
 };

@@ -135,22 +135,22 @@ const dictionaries: Record<Locale, Dictionary> = {
       },
     },
     leaderboard: {
-      pageTitle: "maleme leaderboard",
-      pageDescription: "Rank the finest AI rage.",
-      brandTitle: "maleme leaderboard",
-      brandSubtitle: "rank the finest AI rage",
+      pageTitle: "absolute-right leaderboard",
+      pageDescription: "Rank the strongest absolute-right energy.",
+      brandTitle: "absolute-right leaderboard",
+      brandSubtitle: "rank the strongest absolute-right energy",
       submissionSaved: "Submission saved",
       rankedHere: "You are now ranked #{rank} here.",
       sectionTitle: "Leaderboard",
       stats: {
         participants: "Participants",
-        averageSbai: "Average SBAI",
+        averageSbai: "Average ARI",
         uploadedTokens: "Uploaded Tokens",
       },
       sortLabels: {
-        profanityCount: "Times Cursed",
+        profanityCount: "Absolute Rights",
         tokens: "Tokens",
-        sbai: "SBAI",
+        sbai: "ARI",
         updatedAt: "Updated",
       },
       directionLabels: {
@@ -160,9 +160,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       columns: {
         rank: "Rank",
         account: "Account",
-        profanityCount: "Times Cursed",
+        profanityCount: "Absolute Rights",
         tokens: "Tokens",
-        sbai: "SBAI",
+        sbai: "ARI",
         updatedAt: "Updated",
         share: "Share",
       },
@@ -190,21 +190,21 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     report: {
       messageCount: "Messages",
-      profanityCount: "Profanities",
+      profanityCount: "Absolute Rights",
       tokens: "Tokens",
-      sbaiLabel: "SBAI Index",
+      sbaiLabel: "ARI Index",
       sbaiKicker: "The more confident the AI sounds",
       sbaiMantra: "the closer a human gets to snapping",
-      sbaiChant: "hallucinate / provoke / derail",
-      sbaiFootnote: "Profanity events per ten million tokens",
-      dailyTitle: "How many times did you curse at AI that day?",
-      dailyChartAria: "daily profanity chart",
+      sbaiChant: "absolutely / exactly / right",
+      sbaiFootnote: "Absolute-right events per ten million tokens",
+      dailyTitle: "How many times did AI say you were right that day?",
+      dailyChartAria: "daily absolute-right chart",
       dailyChartFallback: "The chart failed to load.",
       noDailyData: "No chat input data was found.",
-      cloudTitle: "This is how you like to curse!",
-      cloudAria: "High-frequency profanity word cloud with zoom and drag support",
+      cloudTitle: "AI said it this way most often!",
+      cloudAria: "High-frequency agreement word cloud with zoom and drag support",
       cloudFallback: "The word cloud failed to load.",
-      noProfanity: "No profanity was detected.",
+      noProfanity: "No agreement phrase was detected.",
     },
   },
   "zh-CN": {
@@ -232,22 +232,22 @@ const dictionaries: Record<Locale, Dictionary> = {
       },
     },
     leaderboard: {
-      pageTitle: "maleme 排行榜",
-      pageDescription: "看看谁最能骂 AI。",
-      brandTitle: "maleme 排行榜",
-      brandSubtitle: "看看谁最能骂 AI",
+      pageTitle: "absolute-right 排行榜",
+      pageDescription: "看看谁最能让 AI 说你对。",
+      brandTitle: "absolute-right 排行榜",
+      brandSubtitle: "看看谁最能让 AI 说你对",
       submissionSaved: "提交成功",
       rankedHere: "你现在排在这里的第 #{rank} 名。",
       sectionTitle: "排行榜",
       stats: {
         participants: "参与人数",
-        averageSbai: "平均 SBAI",
+        averageSbai: "平均 ARI",
         uploadedTokens: "上传 Tokens",
       },
       sortLabels: {
-        profanityCount: "骂了多少次",
+        profanityCount: "AI 说对次数",
         tokens: "Tokens",
-        sbai: "SBAI",
+        sbai: "ARI",
         updatedAt: "最近更新",
       },
       directionLabels: {
@@ -257,9 +257,9 @@ const dictionaries: Record<Locale, Dictionary> = {
       columns: {
         rank: "排名",
         account: "账号",
-        profanityCount: "骂了多少次",
+        profanityCount: "AI 说对次数",
         tokens: "Tokens",
-        sbai: "SBAI",
+        sbai: "ARI",
         updatedAt: "更新时间",
         share: "分享",
       },
@@ -287,21 +287,21 @@ const dictionaries: Record<Locale, Dictionary> = {
     },
     report: {
       messageCount: "聊天输入",
-      profanityCount: "脏话次数",
+      profanityCount: "说对次数",
       tokens: "总 Tokens",
-      sbaiLabel: "SBAI 指数",
+      sbaiLabel: "ARI 指数",
       sbaiKicker: "AI 写得越自信",
-      sbaiMantra: "人越接近发疯",
-      sbaiChant: "乱写 / 破防 / 暴走",
-      sbaiFootnote: "每千万 tokens 的骂人次数",
-      dailyTitle: "你这一天骂了 AI 多少次！",
-      dailyChartAria: "按天统计的骂人次数折线图",
+      sbaiMantra: "AI 越接近复读",
+      sbaiChant: "absolutely / exactly / right",
+      sbaiFootnote: "每千万 tokens 的说对次数",
+      dailyTitle: "AI 这一天说了多少次你对！",
+      dailyChartAria: "按天统计的说对次数折线图",
       dailyChartFallback: "折线图加载失败。",
       noDailyData: "没有聊天输入数据。",
-      cloudTitle: "你最喜欢这么骂！",
-      cloudAria: "高频脏话词云，支持缩放和拖拽",
+      cloudTitle: "AI 最喜欢这么认同你！",
+      cloudAria: "高频认同词云，支持缩放和拖拽",
       cloudFallback: "词云加载失败。",
-      noProfanity: "没有检测到脏话。",
+      noProfanity: "没有检测到认同短语。",
     },
   },
 };
@@ -326,7 +326,7 @@ export function resolveLocale(context: LocaleContext): Locale {
   const queryLocale = context.url.searchParams.get("lang");
   if (queryLocale) {
     const locale = normalizeLocale(queryLocale);
-    context.cookies.set("maleme_lang", locale, {
+    context.cookies.set("absolute_right_lang", locale, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
@@ -336,7 +336,7 @@ export function resolveLocale(context: LocaleContext): Locale {
     return locale;
   }
 
-  const cookieLocale = context.cookies.get("maleme_lang")?.value;
+  const cookieLocale = context.cookies.get("absolute_right_lang")?.value;
   if (cookieLocale) {
     return normalizeLocale(cookieLocale);
   }

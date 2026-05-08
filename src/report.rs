@@ -39,13 +39,13 @@ struct ReportData {
     daily_model_series: Vec<DailyModelSeries>,
     model_sbai: Vec<ModelSbai>,
     word_counts: Vec<(String, i64)>,
-    total_profanities: i64,
+    total_agreements: i64,
     total_tokens: i64,
     sbai: f64,
     message_count: usize,
     range_start: String,
     range_end: String,
-    submit_endpoint: &'static str,
+    submit_endpoint: String,
 }
 
 struct ReportTheme {
@@ -174,7 +174,7 @@ pub fn render_report(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>maleme report</title>
+  <title>absolute-right report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
@@ -767,8 +767,8 @@ pub fn render_report(
             <div class="meta-value number-roll" data-target-number="{message_count}" data-decimals="0">0</div>
           </div>
           <div class="meta-item">
-            <div class="meta-label">脏话次数</div>
-            <div class="meta-value number-roll" data-target-number="{total_profanities}" data-decimals="0">0</div>
+            <div class="meta-label">AI 说了几次「你说的对」</div>
+            <div class="meta-value number-roll" data-target-number="{total_agreements}" data-decimals="0">0</div>
           </div>
           <div class="meta-item">
             <div class="meta-label">总 Tokens</div>
@@ -776,18 +776,18 @@ pub fn render_report(
           </div>
         </div>
         <form class="submit-form" method="post" action="{submit_endpoint}">
-          <input type="hidden" name="profanityCount" value="{total_profanities}">
+          <input type="hidden" name="profanityCount" value="{total_agreements}">
           <input type="hidden" name="tokens" value="{total_tokens}">
           <input type="hidden" name="sbai" value="{sbai:.3}">
           <textarea hidden name="modelSbaiPayload">{model_sbai_payload}</textarea>
           <textarea hidden name="reportPayload">{submission_payload}</textarea>
-          <button type="submit" class="submit-button">提交到 leaderboard 看看你有多能骂！</button>
+          <button type="submit" class="submit-button">提交到 leaderboard 看看你的 AI 有多服你！</button>
         </form>
         </div>
       </div>
       <div class="panel sbai-card">
         <div class="sbai-header">
-          <div class="sbai-label">SBAI 指数 / 每千万 tokens 的骂人次数</div>
+          <div class="sbai-label">AI 认怂指数 / 每千万 tokens AI 对你说了多少次「你说的对」</div>
           <div class="sbai-alert">{sbai_state}</div>
         </div>
         <div class="sbai-value-wrap">
@@ -801,12 +801,12 @@ pub fn render_report(
 
     <section class="layout">
       <div class="panel viz-panel chart-panel">
-        <h2>你这一天骂了 AI 多少次！</h2>
+        <h2>AI 这一天对你说了多少次「你说的对」</h2>
         <div class="chart-wrap">{chart}</div>
       </div>
 
       <div class="panel viz-panel cloud-panel">
-        <h2>你最喜欢这么骂！</h2>
+        <h2>AI 最喜欢这么向你认怂！</h2>
         {word_cloud}
       </div>
     </section>
@@ -1002,7 +1002,7 @@ pub fn render_report(
               formatter(params) {{
                 const visible = params.filter(point => Number(point.data || 0) > 0);
                 if (!visible.length) {{
-                  return `${{params[0].axisValue}}<br/>这一天没有骂到 AI`;
+                  return `${{params[0].axisValue}}<br/>这一天 AI 没有对你说「你说的对」`;
                 }}
 
                 return [
@@ -1413,12 +1413,12 @@ pub fn render_report(
 </body>
 </html>"#,
         message_count = data.message_count,
-        total_profanities = data.total_profanities,
+        total_agreements = data.total_agreements,
         total_tokens = data.total_tokens,
         sbai = data.sbai,
         submission_payload = submission_payload,
         model_sbai_payload = model_sbai_payload,
-        headline = report_headline(&data.range_start, &data.range_end, data.total_profanities),
+        headline = report_headline(&data.range_start, &data.range_end, data.total_agreements),
         chart = chart,
         word_cloud = word_cloud,
         model_sbai = model_sbai,
@@ -1473,13 +1473,13 @@ fn build_report_data(
             daily_model_series: Vec::new(),
             model_sbai: Vec::new(),
             word_counts: Vec::new(),
-            total_profanities: 0,
+            total_agreements: 0,
             total_tokens: tokens,
             sbai: 0.0,
             message_count: 0,
             range_start: "还没有记录".to_owned(),
             range_end: "还没有记录".to_owned(),
-            submit_endpoint: "https://leaderboard.sbai.uk/submit",
+            submit_endpoint: leaderboard_submit_endpoint(),
         });
     }
 
@@ -1487,11 +1487,14 @@ fn build_report_data(
     let mut daily_model_counts: BTreeMap<String, BTreeMap<i64, i64>> = BTreeMap::new();
     let mut profanity_counts_by_model: BTreeMap<String, i64> = BTreeMap::new();
     let mut word_counts = BTreeMap::new();
-    let mut total_profanities = 0_i64;
+    let mut total_agreements = 0_i64;
     let mut min_day = messages[0].time.div_euclid(DAY_MS);
     let mut max_day = min_day;
 
     for message in messages {
+        if !message.is_assistant {
+            continue;
+        }
         let day = message.time.div_euclid(DAY_MS);
         let counts = detector.detect(&message.text);
         let mut daily_total = 0_i64;
@@ -1506,7 +1509,7 @@ fn build_report_data(
 
         for (word, count) in counts {
             daily_total += count;
-            total_profanities += count;
+            total_agreements += count;
             *word_counts.entry(word).or_insert(0) += count;
         }
 
@@ -1594,7 +1597,7 @@ fn build_report_data(
     let sbai = if tokens == 0 {
         0.0
     } else {
-        total_profanities as f64 * 10_000_000.0 / tokens as f64
+        total_agreements as f64 * 10_000_000.0 / tokens as f64
     };
 
     Ok(ReportData {
@@ -1602,34 +1605,41 @@ fn build_report_data(
         daily_model_series,
         model_sbai,
         word_counts: word_series,
-        total_profanities,
+        total_agreements,
         total_tokens: tokens,
         sbai,
         message_count: messages.len(),
         range_start,
         range_end,
-        submit_endpoint: "https://leaderboard.sbai.uk/submit",
+        submit_endpoint: leaderboard_submit_endpoint(),
     })
 }
 
-fn report_headline(range_start: &str, range_end: &str, total_profanities: i64) -> String {
-    if total_profanities < 10 {
+fn leaderboard_submit_endpoint() -> String {
+    std::env::var("ABSOLUTE_RIGHT_SUBMIT_ENDPOINT")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| "https://leaderboard.absolute-right.dev/submit".to_owned())
+}
+
+fn report_headline(range_start: &str, range_end: &str, total_agreements: i64) -> String {
+    if total_agreements < 10 {
         return format!(
-            "心如止水。{} 到 {}，你只骂了 AI <span class=\"headline-count\">{}</span> 次。",
-            range_start, range_end, total_profanities
+            "心如止水。{} 到 {}，AI 只对你说了 <span class=\"headline-count\">{}</span> 次「你说的对」。",
+            range_start, range_end, total_agreements
         );
     }
 
-    if total_profanities < 100 {
+    if total_agreements < 100 {
         return format!(
-            "喜报！！！你的心态也太平稳了叭！！！！{} 到 {}，只骂了 AI <span class=\"headline-count\">{}</span> 次！",
-            range_start, range_end, total_profanities
+            "稳如老狗！！{} 到 {}，AI 只对你说了 <span class=\"headline-count\">{}</span> 次「你说的对」！",
+            range_start, range_end, total_agreements
         );
     }
 
     format!(
-        "喜报！！你从 {} 到 {} 一共骂了 AI <span class=\"headline-count\">{}</span> 次！",
-        range_start, range_end, total_profanities
+        "喜报！！从 {} 到 {}，AI 一共附和你 <span class=\"headline-count\">{}</span> 次！",
+        range_start, range_end, total_agreements
     )
 }
 
@@ -1795,18 +1805,18 @@ fn report_theme(sbai: f64) -> ReportTheme {
 
 fn sbai_state_copy(sbai: f64) -> (&'static str, &'static str) {
     if sbai < 0.5 {
-        return ("还能忍", "AI 还在试探，你已经有点绷不住了。");
+        return ("还能忍", "AI 偶尔说一句你对，还没形成习惯。");
     }
 
     if sbai < 2.0 {
-        return ("开始红温", "AI 每多自信一分，人就更想当场开骂。");
+        return ("开始红温", "AI 每多自信一分，就越爱说你对。");
     }
 
     if sbai < 5.0 {
-        return ("马上开骂", "AI 写得越笃定，人越接近发疯。");
+        return ("马上附和", "AI 写得越笃定，越忍不住要说你对。");
     }
 
-    ("彻底爆炸", "已经不是调试，是一场精神消耗战。")
+    ("彻底爆炸", "AI 已经放弃思考，只会说你对。")
 }
 
 fn render_line_chart(
@@ -1841,14 +1851,14 @@ fn render_line_chart(
     .replace("</", "<\\/");
 
     format!(
-        r#"<div id="daily-chart" class="chart-host" data-series='{}' aria-label="daily profanity chart by model"></div><div id="daily-chart-fallback" class="chart-fallback">折线图加载失败。</div>"#,
+        r#"<div id="daily-chart" class="chart-host" data-series='{}' aria-label="daily agreement chart by model"></div><div id="daily-chart-fallback" class="chart-fallback">折线图加载失败。</div>"#,
         points_json
     )
 }
 
 fn render_word_cloud(word_counts: &[(String, i64)]) -> Result<String, ReportError> {
     if word_counts.is_empty() {
-        return Ok(r#"<div class="empty">没有检测到脏话。</div>"#.to_owned());
+        return Ok(r#"<div class="empty">没有检测到认同。</div>"#.to_owned());
     }
 
     let words = word_counts
@@ -1867,7 +1877,7 @@ fn render_word_cloud(word_counts: &[(String, i64)]) -> Result<String, ReportErro
 
     Ok(format!(
         r#"<div class="cloud">
-  <div id="word-cloud-viewport" class="cloud-viewport" aria-label="高频脏话词云，支持缩放和拖拽">
+  <div id="word-cloud-viewport" class="cloud-viewport" aria-label="高频认同词云，支持缩放和拖拽">
     <canvas id="word-cloud-scene" class="cloud-scene" data-words='{}'></canvas>
     <div id="word-cloud-fallback" class="cloud-fallback">3D 词云加载失败。</div>
   </div>
@@ -1923,7 +1933,7 @@ fn render_submission_payload(data: &ReportData) -> Result<String, ReportError> {
         "rangeStart": data.range_start,
         "rangeEnd": data.range_end,
         "messageCount": data.message_count,
-        "profanityCount": data.total_profanities,
+        "profanityCount": data.total_agreements,
         "tokens": data.total_tokens,
         "sbai": data.sbai,
         "modelSbai": data.model_sbai.iter().map(|entry| {
@@ -1974,7 +1984,7 @@ fn report_filename() -> Result<String, ReportError> {
         .duration_since(UNIX_EPOCH)
         .map_err(ReportError::SystemTime)?
         .as_secs();
-    Ok(format!("maleme-report-{timestamp}.html"))
+    Ok(format!("absolute-right-report-{timestamp}.html"))
 }
 
 fn day_label(day: i64) -> Result<String, ReportError> {
@@ -2038,24 +2048,27 @@ mod tests {
                 model: Some("gpt-5.4".to_owned()),
                 text: "fuck fuck".to_owned(),
                 time: 0,
+                is_assistant: true,
             },
             UserMessage {
                 adapter: AdapterKind::Claude,
                 model: None,
                 text: "hello".to_owned(),
                 time: 86_400_000,
+                is_assistant: false,
             },
             UserMessage {
                 adapter: AdapterKind::OpenCode,
                 model: Some("claude-opus-4.5".to_owned()),
                 text: "傻逼".to_owned(),
                 time: 172_800_000,
+                is_assistant: true,
             },
         ];
 
         let data = build_report_data(&messages, 4, &model_tokens, &detector).unwrap();
 
-        assert_eq!(data.total_profanities, 3);
+        assert_eq!(data.total_agreements, 3);
         assert_eq!(data.daily_counts.len(), 3);
         assert_eq!(data.daily_counts[0].count, 2);
         assert_eq!(data.daily_counts[1].count, 0);
@@ -2087,13 +2100,14 @@ mod tests {
             model: Some("gpt-5.4".to_owned()),
             text: "fuck".to_owned(),
             time: 0,
+            is_assistant: true,
         }];
 
         let html = render_report(&messages, 2, &model_tokens, &detector).unwrap();
 
-        assert!(html.contains("SBAI 指数"));
-        assert!(html.contains("你这一天骂了 AI 多少次！"));
-        assert!(html.contains("你最喜欢这么骂！"));
+                assert!(html.contains("AI 认怂指数"));
+        assert!(html.contains("AI 这一天对你说了多少次「你说的对」"));
+        assert!(html.contains("AI 最喜欢这么向你认怂！"));
         assert!(html.contains("fuck"));
         assert!(html.contains("心如止水"));
         assert!(html.contains("daily-chart"));
@@ -2103,8 +2117,8 @@ mod tests {
         assert!(html.contains("getContext('2d')"));
         assert!(html.contains("sbai-alert"));
         assert!(html.contains("彻底爆炸"));
-        assert!(html.contains("提交到 leaderboard 看看你有多能骂！"));
-        assert!(html.contains("https://leaderboard.sbai.uk/submit"));
+                assert!(html.contains("提交到 leaderboard 看看你的 AI 有多服你！"));
+        assert!(html.contains("https://leaderboard.absolute-right.dev/submit"));
         assert!(html.contains("name=\"reportPayload\""));
         assert!(html.contains("name=\"modelSbaiPayload\""));
         assert!(html.contains("\"modelSbai\""));
@@ -2116,15 +2130,15 @@ mod tests {
     #[test]
     fn headline_changes_by_count() {
         assert!(report_headline("2026-01-01", "2026-01-03", 3).contains("心如止水"));
-        assert!(report_headline("2026-01-01", "2026-01-03", 30).contains("心态也太平稳了叭"));
-        assert!(report_headline("2026-01-01", "2026-01-03", 300).contains("喜报！！你从"));
+                assert!(report_headline("2026-01-01", "2026-01-03", 30).contains("稳如老狗！！"));
+        assert!(report_headline("2026-01-01", "2026-01-03", 300).contains("AI 一共附和你"));
     }
 
     #[test]
     fn sbai_copy_changes_by_level() {
         assert_eq!(sbai_state_copy(0.2).0, "还能忍");
         assert_eq!(sbai_state_copy(1.2).0, "开始红温");
-        assert_eq!(sbai_state_copy(3.2).0, "马上开骂");
+        assert_eq!(sbai_state_copy(3.2).0, "马上附和");
         assert_eq!(sbai_state_copy(8.8).0, "彻底爆炸");
     }
 }

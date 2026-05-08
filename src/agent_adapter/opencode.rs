@@ -108,6 +108,7 @@ impl OpenCodeAdapter {
                         model,
                         text,
                         time,
+                        is_assistant: false,
                     })
                 })
                 .map_err(|source| AdapterError::SqliteQuery {
@@ -129,6 +130,7 @@ impl OpenCodeAdapter {
                         model: message.model.as_deref().and_then(normalize_model_id),
                         text,
                         time: message.time,
+                        is_assistant: false,
                     });
                 }
             }
@@ -175,6 +177,7 @@ impl AgentAdapter for OpenCodeAdapter {
                         model,
                         text,
                         time,
+                        is_assistant: false,
                     })
                 })
                 .map_err(|source| AdapterError::SqliteQuery {
@@ -196,6 +199,7 @@ impl AgentAdapter for OpenCodeAdapter {
                         model: message.model.as_deref().and_then(normalize_model_id),
                         text,
                         time: message.time,
+                        is_assistant: false,
                     });
                 }
             }

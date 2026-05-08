@@ -22,7 +22,7 @@ export const prerender = false;
 export const GET: APIRoute = async ({ cookies, redirect, url }) => {
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const expectedState = cookies.get("maleme_oauth_state")?.value;
+  const expectedState = cookies.get("absolute_right_oauth_state")?.value;
 
   if (!code || !state || !expectedState || state !== expectedState) {
     return redirect("/?state=oauth-denied");
@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ cookies, redirect, url }) => {
       sameSite: sessionCookieSameSite(url),
       secure: isSecureRequest(url),
     });
-    cookies.delete("maleme_oauth_state", { path: "/" });
+    cookies.delete("absolute_right_oauth_state", { path: "/" });
 
     const pendingValue = cookies.get(getPendingSubmissionCookieName())?.value;
 

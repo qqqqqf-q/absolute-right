@@ -14,9 +14,9 @@ const { active, title, subtitle, locale } = Astro.props;
 const t = getI18n(locale);
 
 function withLocale(href: string, nextLocale: Locale) {
-  const url = new URL(href);
+  const url = new URL(href, Astro.url);
   url.searchParams.set("lang", nextLocale);
-  return url.toString();
+  return href.startsWith("http") ? url.toString() : `${url.pathname}${url.search}`;
 }
 
 function currentLanguageHref(nextLocale: Locale) {
@@ -26,8 +26,8 @@ function currentLanguageHref(nextLocale: Locale) {
 }
 
 const navItems: { key: NavKey; label: string; href: string }[] = [
-  { key: "leaderboard", label: t.common.nav.leaderboard, href: withLocale("https://leaderboard.sbai.uk", locale) },
-  { key: "tarot", label: t.common.nav.tarot, href: withLocale("https://taluo.sbai.uk", locale) },
+  { key: "leaderboard", label: t.common.nav.leaderboard, href: withLocale("/", locale) },
+  { key: "tarot", label: t.common.nav.tarot, href: withLocale("/?tarot=1", locale) },
 ];
 ---
 
@@ -58,7 +58,7 @@ const navItems: { key: NavKey; label: string; href: string }[] = [
 
     <a
       class="repo-link"
-      href="https://github.com/Yeuoly/maleme"
+      href="https://github.com/qqqqqf-q/absolute-right"
       target="_blank"
       rel="noreferrer"
       aria-label={t.common.githubRepository}

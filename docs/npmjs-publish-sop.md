@@ -1,4 +1,4 @@
-# SOP: 发布 maleme 到 npmjs
+# SOP: 发布 absolute-right 到 npmjs
 
 日期：2026-04-14
 

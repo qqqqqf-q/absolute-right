@@ -13,23 +13,23 @@ const __dirname = path.dirname(__filename);
 const TARGETS = {
   "darwin-arm64": {
     triple: "aarch64-apple-darwin",
-    packageName: "maleme-darwin-arm64",
+    packageName: "absolute-right-darwin-arm64",
   },
   "darwin-x64": {
     triple: "x86_64-apple-darwin",
-    packageName: "maleme-darwin-x64",
+    packageName: "absolute-right-darwin-x64",
   },
   "linux-arm64": {
     triple: "aarch64-unknown-linux-musl",
-    packageName: "maleme-linux-arm64",
+    packageName: "absolute-right-linux-arm64",
   },
   "linux-x64": {
     triple: "x86_64-unknown-linux-musl",
-    packageName: "maleme-linux-x64",
+    packageName: "absolute-right-linux-x64",
   },
   "win32-x64": {
     triple: "x86_64-pc-windows-msvc",
-    packageName: "maleme-win32-x64",
+    packageName: "absolute-right-win32-x64",
   },
 };
 
@@ -67,12 +67,12 @@ function resolveBinaryPath(target) {
 
   if (!vendorRoot) {
     throw new Error(
-      `Missing optional dependency ${target.packageName}. Reinstall with: npm install -g maleme@latest`,
+      `Missing optional dependency ${target.packageName}. Reinstall with: npm install -g absolute-right@latest`,
     );
   }
 
-  const binaryName = process.platform === "win32" ? "maleme.exe" : "maleme";
-  return path.join(vendorRoot, target.triple, "maleme", binaryName);
+  const binaryName = process.platform === "win32" ? "absolute-right.exe" : "absolute-right";
+  return path.join(vendorRoot, target.triple, "absolute-right", binaryName);
 }
 
 const target = detectTarget();

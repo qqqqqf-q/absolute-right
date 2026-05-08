@@ -1,11 +1,11 @@
 {
-  "name": "maleme-linux-x64",
+  "name": "absolute-right-linux-x64",
   "version": "0.1.17",
-  "description": "Linux x64 binary for maleme.",
+  "description": "Linux x64 binary for absolute-right.",
   "license": "WTFPL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yeuoly/maleme.git"
+    "url": "git+https://github.com/qqqqqf-q/absolute-right.git"
   },
   "os": [
     "linux"

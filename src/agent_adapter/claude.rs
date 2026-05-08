@@ -240,7 +240,8 @@ struct ClaudeProjectUserEvent {
     #[serde(default, rename = "isMeta")]
     is_meta: Option<bool>,
     timestamp: String,
-    uuid: Option<String>,
+    #[serde(rename = "uuid")]
+    _uuid: Option<String>,
     #[serde(rename = "parentUuid")]
     parent_uuid: Option<String>,
     message: ClaudeProjectMessage,
@@ -280,13 +281,17 @@ struct ClaudeProjectAssistantEvent {
     #[serde(rename = "uuid")]
     uuid: Option<String>,
     #[serde(rename = "parentUuid")]
-    parent_uuid: Option<String>,
+    _parent_uuid: Option<String>,
+    #[serde(default)]
+    timestamp: Option<String>,
     message: ClaudeProjectAssistantMessage,
 }
 
 #[derive(Debug, Deserialize)]
 struct ClaudeProjectAssistantMessage {
     model: Option<String>,
+    #[serde(default)]
+    content: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -419,6 +424,7 @@ fn parse_claude_user_message(
     raw_line: &str,
     line_number: usize,
     current_model: &mut Option<String>,
+    project_models: Option<&BTreeMap<String, String>>,
 ) -> Result<Option<UserMessage>, AdapterError> {
     let kind: ClaudeEventKind =
         serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
@@ -427,11 +433,14 @@ fn parse_claude_user_message(
             source,
         })?;
 
+    let is_assistant = match kind.event_type.as_str() {
+        "user" => false,
+        "assistant" => true,
+        _ => return Ok(None),
+    };
+
     match log_file.kind {
         ClaudeLogKind::Transcript => {
-            if kind.event_type != "user" {
-                return Ok(None);
-            }
             let event: ClaudeUserEvent =
                 serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
                     path: log_file.path.clone(),
@@ -443,28 +452,42 @@ fn parse_claude_user_message(
                 line_number,
                 event.timestamp,
                 event.content,
-                current_model.clone(),
+                None,
+                is_assistant,
             )
         }
         ClaudeLogKind::Project => {
-            if kind.event_type == "assistant" {
-                // Update current_model when we see an assistant message
-                let event: ClaudeProjectAssistantEvent =
-                    serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
+            if is_assistant {
+                let event: ClaudeProjectAssistantEvent = serde_json::from_str(raw_line).map_err(
+                    |source| AdapterError::InvalidJsonLine {
                         path: log_file.path.clone(),
                         line: line_number,
                         source,
-                    })?;
-                if !event.is_sidechain {
-                    if let Some(model) = event.message.model {
-                        *current_model = normalize_model_id(&model);
-                    }
+                    },
+                )?;
+                if event.is_sidechain {
+                    return Ok(None);
                 }
-                return Ok(None);
+                if let Some(model) = event.message.model.as_ref() {
+                    *current_model = normalize_model_id(model);
+                }
+                let Some(timestamp) = event.timestamp else {
+                    return Ok(None);
+                };
+                let Some(content) = event
+                    .message
+                    .content
+                    .as_ref()
+                    .and_then(|c| extract_user_text(c))
+                else {
+                    return Ok(None);
+                };
+                let model = event.message.model.or_else(|| current_model.clone());
+                return build_claude_user_message(
+                    log_file, line_number, timestamp, content, model, true,
+                );
             }
-            if kind.event_type != "user" {
-                return Ok(None);
-            }
+
             let event: ClaudeProjectUserEvent =
                 serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
                     path: log_file.path.clone(),
@@ -474,15 +497,22 @@ fn parse_claude_user_message(
             if event.is_sidechain || event.is_meta == Some(true) {
                 return Ok(None);
             }
-            // Use current_model directly (updated by sequential assistant messages)
-            let content = extract_user_text(&event.message.content)
-                .unwrap_or_else(|| "".to_string());
+            let Some(content) = extract_user_text(&event.message.content) else {
+                return Ok(None);
+            };
+            let model = event
+                .parent_uuid
+                .as_ref()
+                .and_then(|uuid| project_models.and_then(|models| models.get(uuid)))
+                .cloned()
+                .or_else(|| current_model.clone());
             build_claude_user_message(
                 log_file,
                 line_number,
                 event.timestamp,
                 content,
-                current_model.clone(),
+                model,
+                false,
             )
         }
     }
@@ -494,6 +524,7 @@ fn build_claude_user_message(
     timestamp: String,
     content: String,
     model: Option<String>,
+    is_assistant: bool,
 ) -> Result<Option<UserMessage>, AdapterError> {
     let datetime = OffsetDateTime::parse(&timestamp, &Rfc3339).map_err(|source| {
         AdapterError::InvalidTimestamp {
@@ -516,6 +547,7 @@ fn build_claude_user_message(
         model: model.as_deref().and_then(normalize_model_id),
         text,
         time: (datetime.unix_timestamp_nanos() / 1_000_000) as i64,
+        is_assistant,
     }))
 }
 
@@ -543,22 +575,68 @@ fn parse_claude_log_file(
     contents: &str,
 ) -> Result<Vec<UserMessage>, AdapterError> {
     let mut messages = Vec::new();
+    let project_models = if log_file.kind == ClaudeLogKind::Project {
+        Some(collect_project_models(log_file, contents)?)
+    } else {
+        None
+    };
 
-    // For Project format: maintain current model as we parse sequentially
-    // This avoids UUID chain lookup issues - each user message gets the model
-    // from the most recent assistant message in sequence
+    // Project logs may reference assistant model metadata before or after user lines.
     let mut current_model: Option<String> = None;
 
     for (index, raw_line) in contents.lines().enumerate() {
         let line_number = index + 1;
-        if let Ok(Some(message)) =
-            parse_claude_user_message(log_file, raw_line, line_number, &mut current_model)
-        {
+        if let Ok(Some(message)) = parse_claude_user_message(
+            log_file,
+            raw_line,
+            line_number,
+            &mut current_model,
+            project_models.as_ref(),
+        ) {
             messages.push(message);
         }
     }
 
     Ok(messages)
+}
+
+fn collect_project_models(
+    log_file: &ClaudeLogFile,
+    contents: &str,
+) -> Result<BTreeMap<String, String>, AdapterError> {
+    let mut models = BTreeMap::new();
+
+    for (index, raw_line) in contents.lines().enumerate() {
+        let line_number = index + 1;
+        let kind: ClaudeEventKind =
+            serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
+                path: log_file.path.clone(),
+                line: line_number,
+                source,
+            })?;
+        if kind.event_type != "assistant" {
+            continue;
+        }
+
+        let event: ClaudeProjectAssistantEvent =
+            serde_json::from_str(raw_line).map_err(|source| AdapterError::InvalidJsonLine {
+                path: log_file.path.clone(),
+                line: line_number,
+                source,
+            })?;
+        if event.is_sidechain {
+            continue;
+        }
+        let (Some(uuid), Some(model)) = (event.uuid, event.message.model) else {
+            continue;
+        };
+        let Some(model) = normalize_model_id(&model) else {
+            continue;
+        };
+        models.insert(uuid, model);
+    }
+
+    Ok(models)
 }
 
 #[cfg(test)]
@@ -594,15 +672,19 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(messages.len(), 2);
+        assert_eq!(messages.len(), 3);
         assert_eq!(format!("{:?}", messages[0].adapter), "Claude");
         assert_eq!(messages[0].model, None);
         assert_eq!(messages[0].text, "actual user text");
         assert_eq!(messages[0].time, 1_772_607_716_809);
+        assert_eq!(messages[0].is_assistant, false);
+        assert_eq!(messages[1].text, "ignore");
+        assert_eq!(messages[1].is_assistant, true);
         assert_eq!(
-            messages[1].text,
+            messages[2].text,
             "[analyze-mode]\nGather context first.\n\nContinue with the full answer."
         );
+        assert_eq!(messages[2].is_assistant, false);
     }
 
     #[tokio::test]

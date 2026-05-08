@@ -12,7 +12,7 @@ import type { LeaderboardSortDirection, LeaderboardSortKey } from "../lib/types"
 const sortValue = Astro.url.searchParams.get("sort");
 const directionValue = Astro.url.searchParams.get("dir");
 const tarotPreview = Astro.url.searchParams.get("view") === "tarot";
-const isTarotHost = Astro.url.hostname === "taluo.sbai.uk" || tarotPreview;
+const isTarotHost = tarotPreview;
 const submittedState = Astro.url.searchParams.get("state") === "submitted";
 const submittedRankValue = Number(Astro.url.searchParams.get("rank"));
 const submittedRank = Number.isFinite(submittedRankValue) && submittedRankValue > 0

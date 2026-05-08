@@ -7,28 +7,28 @@ const repoRoot = path.resolve(scriptDir, "..", "..");
 
 const PLATFORM_BY_TARGET = {
   "aarch64-apple-darwin": {
-    packageName: "maleme-darwin-arm64",
-    binaryName: "maleme",
+    packageName: "absolute-right-darwin-arm64",
+    binaryName: "absolute-right",
     directory: "darwin-arm64",
   },
   "x86_64-apple-darwin": {
-    packageName: "maleme-darwin-x64",
-    binaryName: "maleme",
+    packageName: "absolute-right-darwin-x64",
+    binaryName: "absolute-right",
     directory: "darwin-x64",
   },
   "aarch64-unknown-linux-musl": {
-    packageName: "maleme-linux-arm64",
-    binaryName: "maleme",
+    packageName: "absolute-right-linux-arm64",
+    binaryName: "absolute-right",
     directory: "linux-arm64",
   },
   "x86_64-unknown-linux-musl": {
-    packageName: "maleme-linux-x64",
-    binaryName: "maleme",
+    packageName: "absolute-right-linux-x64",
+    binaryName: "absolute-right",
     directory: "linux-x64",
   },
   "x86_64-pc-windows-msvc": {
-    packageName: "maleme-win32-x64",
-    binaryName: "maleme.exe",
+    packageName: "absolute-right-win32-x64",
+    binaryName: "absolute-right.exe",
     directory: "win32-x64",
   },
 };
@@ -59,7 +59,7 @@ const vendorRoot = path.join(
   config.directory,
   "vendor",
   targetTriple,
-  "maleme",
+  "absolute-right",
 );
 
 fs.rmSync(path.join(repoRoot, "npm", "platforms", config.directory, "vendor"), {
@@ -71,7 +71,7 @@ fs.mkdirSync(vendorRoot, { recursive: true });
 const destinationPath = path.join(vendorRoot, config.binaryName);
 fs.copyFileSync(sourcePath, destinationPath);
 
-if (config.binaryName === "maleme") {
+if (config.binaryName === "absolute-right") {
   fs.chmodSync(destinationPath, 0o755);
 }
 

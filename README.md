@@ -1,19 +1,23 @@
-# maleme
+# absolute-right
 
-[![Repository](https://img.shields.io/badge/repository-GitHub-181717?logo=github)](https://github.com/Yeuoly/maleme)
+[![Repository](https://img.shields.io/badge/repository-GitHub-181717?logo=github)](https://github.com/qqqqqf-q/absolute-right)
 [![Language](https://img.shields.io/badge/language-Rust-000000?logo=rust)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/license-WTFPL-brightgreen)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-local--first-blue)](https://github.com/Yeuoly/maleme)
-[![Output](https://img.shields.io/badge/output-standalone%20HTML-orange)](https://github.com/Yeuoly/maleme)
+[![Platform](https://img.shields.io/badge/platform-local--first-blue)](https://github.com/qqqqqf-q/absolute-right)
+[![Output](https://img.shields.io/badge/output-standalone%20HTML-orange)](https://github.com/qqqqqf-q/absolute-right)
 
-`maleme` is a local-first Rust toolkit for collecting user-authored prompt history from coding agents, extracting profanity usage signals, and producing a compact visual analytics report.
+`absolute-right`（对了么）is a local-first Rust toolkit for collecting coding-agent history, detecting how often assistants say variants of "you are absolutely right", and producing a compact visual analytics report.
 
-The CLI is already published to npm, so you can run it directly without a global install:
+Slogan: Ready for absolute?
+
+This project is a fork-derived remix of [`Yeuoly/maleme`](https://github.com/Yeuoly/maleme). The original license is preserved, and the repository history keeps the upstream relationship visible.
+
+After the npm release is published, the CLI can run without a global install:
 
 ```bash
-npx maleme
-bunx maleme
-vpx maleme
+npx absolute-right
+bunx absolute-right
+vpx absolute-right
 ```
 <img width="2894" height="1610" alt="image" src="https://github.com/user-attachments/assets/319b06aa-c132-403b-8072-4c9e7bb5efb8" />
 
@@ -25,7 +29,7 @@ vpx maleme
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Supported Data Sources](#supported-data-sources)
-- [Profanity Lexicon](#profanity-lexicon)
+- [Agreement Lexicon](#agreement-lexicon)
 - [Report Generation](#report-generation)
 - [Development](#development)
 - [Install](#install)
@@ -38,36 +42,36 @@ vpx maleme
 The project is designed around three practical requirements:
 
 1. Unified ingestion of locally stored conversation history from multiple coding agents.
-2. Deterministic detection and aggregation of profanity usage across multilingual user input.
+2. Deterministic detection and aggregation of AI agreement phrases across multilingual assistant output.
 3. Repeatable generation of a browser-friendly HTML report suitable for local review.
 
 ## Quick Start
 
-Run `maleme` directly from the published npm package:
+Run `absolute-right` directly from the published npm package:
 
 ```bash
-npx maleme
-bunx maleme
-vpx maleme
+npx absolute-right
+bunx absolute-right
+vpx absolute-right
 ```
 
 Or install it globally:
 
 ```bash
-npm install -g maleme
+npm install -g absolute-right
 ```
 
 ## Highlights
 
 - Local-only data processing with no mandatory hosted service dependency
 - Unified adapters for Codex, Claude Code, and OpenCode
-- Embedded multilingual profanity lexicon with file-based maintenance
+- Embedded multilingual agreement lexicon with file-based maintenance
 - Single-file HTML report generation for lightweight sharing and inspection
-- Token-normalized profanity metrics for cross-session comparison
+- Token-normalized agreement metrics for cross-session comparison
 
 ## Overview
 
-`maleme` reads local chat history from supported coding agents, normalizes user-authored text input, computes profanity frequency metrics, and renders a standalone HTML report.
+`absolute-right` reads local chat history from supported coding agents, normalizes assistant-authored text output, computes agreement frequency metrics, and renders a standalone HTML report.
 
 The current implementation supports:
 
@@ -77,8 +81,8 @@ The current implementation supports:
 
 The generated report includes:
 
-- Daily profanity frequency over time
-- A normalized profanity intensity metric (`SBAI`)
+- Daily "you are right" frequency over time
+- A normalized agreement metric (`ARI`)
 - A word cloud of the most frequently used terms
 
 ## Architecture
@@ -92,17 +96,17 @@ The repository is organized into a small set of focused modules:
   - token usage extraction
 
 - `src/fuck_detector.rs`
-  Profanity lexicon loading and text matching logic.
+  Agreement lexicon loading and text matching logic. The filename is inherited from upstream and can be renamed in a later cleanup.
 
 - `src/report.rs`
   Report data aggregation, HTML rendering, and local browser launch.
 
 - `data/profanity_lexicon.txt`
-  Editable profanity lexicon embedded into the compiled binary at build time.
+  Editable agreement lexicon embedded into the compiled binary at build time. The filename is inherited from upstream and can be renamed in a later cleanup.
 
 ## Supported Data Sources
 
-`maleme` operates against local files and databases already present on the host system. It does not require a remote service for analysis.
+`absolute-right` operates against local files and databases already present on the host system. It does not require a remote service for analysis.
 
 Current canonical sources:
 
@@ -119,9 +123,9 @@ Current canonical sources:
 - OpenCode:
   - `~/.local/share/opencode/opencode.db`
 
-## Profanity Lexicon
+## Agreement Lexicon
 
-The profanity lexicon is stored in:
+The agreement lexicon is stored in:
 
 - [`data/profanity_lexicon.txt`](data/profanity_lexicon.txt)
 
@@ -145,7 +149,7 @@ Running the binary will:
 
 1. scan supported local agent history
 2. collect user-authored messages
-3. calculate profanity metrics
+3. calculate agreement metrics
 4. generate a standalone HTML report in `~/Downloads`
 5. open the report in the local default browser
 
@@ -174,13 +178,13 @@ cargo test
 Install the published CLI from npm:
 
 ```bash
-npm install -g maleme
+npm install -g absolute-right
 ```
 
 The npm distribution follows the same general pattern used by Codex CLI:
 
-- `maleme` is the lightweight wrapper package
-- `maleme-<platform>-<arch>` packages carry the native binaries
+- `absolute-right` is the lightweight wrapper package
+- `absolute-right-<platform>-<arch>` packages carry the native binaries
 - the wrapper selects the right binary at runtime
 
 Current npm targets wired in this repository:
@@ -206,28 +210,28 @@ Release steps:
 2. run `node scripts/npm/sync-packages.mjs`
 3. commit and push
 4. create and push a matching git tag like `v0.1.0`
-5. let GitHub Actions publish the platform packages first, then the main `maleme` package
+5. let GitHub Actions publish the platform packages first, then the main `absolute-right` package
 
 Local validation on the current machine:
 
 ```bash
 node scripts/npm/sync-packages.mjs
 cargo build --release
-node scripts/npm/stage-binary.mjs aarch64-apple-darwin target/release/maleme
+node scripts/npm/stage-binary.mjs aarch64-apple-darwin target/release/absolute-right
 npm pack ./npm/platforms/darwin-arm64
 npm pack ./npm/main
 ```
 
 ## Repository Metadata
 
-- Source: [github.com/Yeuoly/maleme](https://github.com/Yeuoly/maleme)
+- Source: [github.com/qqqqqf-q/absolute-right](https://github.com/qqqqqf-q/absolute-right)
 - Primary language: Rust
 - License: WTFPL
 - Distribution model: local executable and npm-distributed native binary
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeuoly/maleme&type=Date)](https://star-history.com/#Yeuoly/maleme&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=qqqqqf-q/absolute-right&type=Date)](https://star-history.com/#qqqqqf-q/absolute-right&Date)
 
 ## Scope
 

@@ -2,7 +2,7 @@
 
 ## 问题
 
-本地生成的 `maleme` HTML 报告在分享到 leaderboard 时，只上传了汇总指标：
+本地生成的 `absolute-right` HTML 报告在分享到 leaderboard 时，只上传了汇总指标：
 
 - `profanityCount`
 - `tokens`

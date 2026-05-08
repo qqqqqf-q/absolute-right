@@ -14,10 +14,10 @@ export function getShareImagePath(githubId: number | string) {
 
 export function buildShareTitle(profile: ShareProfile, locale: Locale = "en") {
   if (locale === "zh-CN") {
-    return `${profile.displayName} 的 SBAI 分享卡`;
+    return `${profile.displayName} 的 ARI 分享卡`;
   }
 
-  return `${profile.displayName}'s SBAI Share Card`;
+  return `${profile.displayName}'s ARI Share Card`;
 }
 
 export function buildShareDescription(profile: ShareProfile, locale: Locale = "en") {
@@ -27,9 +27,9 @@ export function buildShareDescription(profile: ShareProfile, locale: Locale = "e
   if (locale === "zh-CN") {
     return [
       `${profile.displayName} · 第 ${profile.rank} 名`,
-      `SBAI ${profile.report.sbai.toFixed(3)}`,
+      `ARI ${profile.report.sbai.toFixed(3)}`,
       `${profile.report.messageCount.toLocaleString(numberLocale)} 条输入`,
-      `${profile.report.profanityCount.toLocaleString(numberLocale)} 次脏话`,
+      `${profile.report.profanityCount.toLocaleString(numberLocale)} 次说对`,
       `${profile.report.tokens.toLocaleString(numberLocale)} tokens`,
       sbaiStatus.state,
     ].join(" · ");
@@ -37,9 +37,9 @@ export function buildShareDescription(profile: ShareProfile, locale: Locale = "e
 
   return [
     `${profile.displayName} · #${profile.rank}`,
-    `SBAI ${profile.report.sbai.toFixed(2)}`,
+    `ARI ${profile.report.sbai.toFixed(2)}`,
     `${profile.report.messageCount.toLocaleString(numberLocale)} messages`,
-    `${profile.report.profanityCount.toLocaleString(numberLocale)} profanities`,
+    `${profile.report.profanityCount.toLocaleString(numberLocale)} agreement events`,
     `${profile.report.tokens.toLocaleString(numberLocale)} tokens`,
     sbaiStatus.state,
   ].join(" · ");
@@ -49,10 +49,10 @@ export function buildShareHeadline(profile: ShareProfile, locale: Locale = "en")
   const numberLocale = getNumberLocale(locale);
 
   if (locale === "zh-CN") {
-    return `${profile.displayName} 最近一次提交一共骂了 AI ${profile.report.profanityCount.toLocaleString(numberLocale)} 次。`;
+    return `${profile.displayName} 最近一次提交一共被 AI 说对了 ${profile.report.profanityCount.toLocaleString(numberLocale)} 次。`;
   }
 
-  return `${profile.displayName}'s latest submission cursed at AI ${profile.report.profanityCount.toLocaleString(numberLocale)} times.`;
+  return `AI told ${profile.displayName} they were right ${profile.report.profanityCount.toLocaleString(numberLocale)} times in the latest submission.`;
 }
 
 export function buildShareButtonText(entry: LeaderboardEntry, locale: Locale = "en") {
@@ -60,16 +60,16 @@ export function buildShareButtonText(entry: LeaderboardEntry, locale: Locale = "
 
   if (locale === "zh-CN") {
     return [
-      `${entry.displayName} 在 maleme 排行榜排第 ${entry.rank} 名`,
-      `SBAI ${entry.sbai.toFixed(3)}`,
-      `${entry.profanityCount.toLocaleString(numberLocale)} 次脏话`,
+      `${entry.displayName} 在 absolute-right 排行榜排第 ${entry.rank} 名`,
+      `ARI ${entry.sbai.toFixed(3)}`,
+      `${entry.profanityCount.toLocaleString(numberLocale)} 次说对`,
     ].join(" • ");
   }
 
   return [
-    `${entry.displayName} is ranked #${entry.rank} on the maleme leaderboard`,
-    `SBAI ${entry.sbai.toFixed(2)}`,
-    `${entry.profanityCount.toLocaleString(numberLocale)} profanities`,
+    `${entry.displayName} is ranked #${entry.rank} on the absolute-right leaderboard`,
+    `ARI ${entry.sbai.toFixed(2)}`,
+    `${entry.profanityCount.toLocaleString(numberLocale)} agreement events`,
   ].join(" • ");
 }
 

@@ -1,9 +1,9 @@
 [package]
-name = "maleme"
+name = "absolute-right"
 version = "0.1.17"
 edition = "2024"
 license = "WTFPL"
-description = "骂了么"
+description = "对了么"
 readme = "README.md"
 
 [dependencies]

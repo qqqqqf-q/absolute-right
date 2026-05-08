@@ -217,77 +217,77 @@ export function getSbaiStatus(sbai: number, locale: Locale = "zh-CN") {
   if (sbai < 0.5) {
     return locale === "zh-CN"
       ? {
-          state: "还能忍",
-          copy: "AI 还在试探，你已经有点绷不住了。",
+          state: "还没开夸",
+          copy: "AI 偶尔认同你，还没有形成肌肉记忆。",
         }
       : {
-          state: "Holding together",
-          copy: "The AI is still probing, and your patience is starting to fray.",
+          state: "Still restrained",
+          copy: "The AI agrees occasionally, but the habit has not fully formed.",
         };
   }
 
   if (sbai < 2) {
     return locale === "zh-CN"
       ? {
-          state: "开始红温",
-          copy: "AI 每多自信一分，人就更想当场开骂。",
+          state: "开始附和",
+          copy: "AI 开始频繁点头，你说什么都像有道理。",
         }
       : {
-          state: "Temperature rising",
-          copy: "Every extra point of AI confidence makes cursing feel more justified.",
+          state: "Agreement rising",
+          copy: "The AI is starting to nod along with suspicious confidence.",
         };
   }
 
   if (sbai < 5) {
     return locale === "zh-CN"
       ? {
-          state: "马上开骂",
-          copy: "AI 写得越笃定，人越接近发疯。",
+          state: "马上附和",
+          copy: "AI 写得越笃定，越忍不住补一句你说得对。",
         }
       : {
-          state: "On the edge",
-          copy: "The more certain the AI sounds, the closer a human gets to losing it.",
+          state: "Almost absolute",
+          copy: "The more certain the AI sounds, the more it wants to call you right.",
         };
   }
 
   return locale === "zh-CN"
     ? {
-        state: "彻底爆炸",
-        copy: "已经不是调试，是一场精神消耗战。",
+        state: "彻底 absolute",
+        copy: "AI 已经放弃抵抗，准备把你说的都判定为对。",
       }
     : {
-        state: "Total meltdown",
-        copy: "This is no longer debugging. It is a straight-up war of attrition.",
+        state: "Fully absolute",
+        copy: "The AI has stopped resisting and is ready to certify you as right.",
       };
 }
 
 export function getReportHeadlineHtml(
   rangeStart: string,
   rangeEnd: string,
-  totalProfanities: number,
+  totalAgreements: number,
   locale: Locale = "zh-CN",
 ) {
   if (locale === "en") {
-    if (totalProfanities < 10) {
-      return `Still waters. From ${rangeStart} to ${rangeEnd}, you cursed at AI only <span class="headline-count">${totalProfanities}</span> times.`;
+    if (totalAgreements < 10) {
+      return `Still restrained. From ${rangeStart} to ${rangeEnd}, AI told you that you were right only <span class="headline-count">${totalAgreements}</span> times.`;
     }
 
-    if (totalProfanities < 100) {
-      return `Good news. From ${rangeStart} to ${rangeEnd}, you cursed at AI just <span class="headline-count">${totalProfanities}</span> times. That is suspiciously calm.`;
+    if (totalAgreements < 100) {
+      return `Ready for absolute? From ${rangeStart} to ${rangeEnd}, AI agreed with you <span class="headline-count">${totalAgreements}</span> times.`;
     }
 
-    return `Good news. From ${rangeStart} to ${rangeEnd}, you cursed at AI <span class="headline-count">${totalProfanities}</span> times in total.`;
+    return `Absolute mode engaged. From ${rangeStart} to ${rangeEnd}, AI agreed with you <span class="headline-count">${totalAgreements}</span> times in total.`;
   }
 
-  if (totalProfanities < 10) {
-    return `心如止水。${rangeStart} 到 ${rangeEnd}，你只骂了 AI <span class="headline-count">${totalProfanities}</span> 次。`;
+  if (totalAgreements < 10) {
+    return `心如止水。${rangeStart} 到 ${rangeEnd}，AI 只说了 <span class="headline-count">${totalAgreements}</span> 次你对。`;
   }
 
-  if (totalProfanities < 100) {
-    return `喜报！！！你的心态也太平稳了叭！！！！${rangeStart} 到 ${rangeEnd}，只骂了 AI <span class="headline-count">${totalProfanities}</span> 次！`;
+  if (totalAgreements < 100) {
+    return `Ready for absolute? ${rangeStart} 到 ${rangeEnd}，AI 说了 <span class="headline-count">${totalAgreements}</span> 次你对！`;
   }
 
-  return `喜报！！你从 ${rangeStart} 到 ${rangeEnd} 一共骂了 AI <span class="headline-count">${totalProfanities}</span> 次！`;
+  return `彻底 absolute！${rangeStart} 到 ${rangeEnd}，AI 一共说了 <span class="headline-count">${totalAgreements}</span> 次你对！`;
 }
 
 export function getReportTheme(sbai: number): ReportTheme {

@@ -1,11 +1,11 @@
 {
-  "name": "maleme",
+  "name": "absolute-right",
   "version": "0.1.17",
-  "description": "Profanity analytics CLI for local coding-agent histories.",
+  "description": "Agreement analytics CLI for local coding-agent histories.",
   "license": "WTFPL",
   "type": "module",
   "bin": {
-    "maleme": "bin/maleme.js"
+    "absolute-right": "bin/absolute-right.js"
   },
   "files": [
     "bin"
@@ -15,13 +15,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yeuoly/maleme.git"
+    "url": "git+https://github.com/qqqqqf-q/absolute-right.git"
   },
   "optionalDependencies": {
-    "maleme-darwin-arm64": "0.1.17",
-    "maleme-darwin-x64": "0.1.17",
-    "maleme-linux-arm64": "0.1.17",
-    "maleme-linux-x64": "0.1.17",
-    "maleme-win32-x64": "0.1.17"
+    "absolute-right-darwin-arm64": "0.1.17",
+    "absolute-right-darwin-x64": "0.1.17",
+    "absolute-right-linux-arm64": "0.1.17",
+    "absolute-right-linux-x64": "0.1.17",
+    "absolute-right-win32-x64": "0.1.17"
   }
 }

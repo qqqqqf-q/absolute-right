@@ -1,4 +1,4 @@
-# SOP: 发布 maleme CLI 和 leaderboard
+# SOP: 发布 absolute-right CLI 和 leaderboard
 
 日期：2026-04-14
 
@@ -44,7 +44,7 @@
 发布顺序：
 
 1. 5 个平台包先发布
-2. `publish-main` 再发布 `maleme`
+2. `publish-main` 再发布 `absolute-right`
 
 关键约束：
 
@@ -68,7 +68,7 @@
 
 1. `pnpm install --frozen-lockfile`
 2. `pnpm build`
-3. `wrangler d1 migrations apply maleme-leaderboard --remote`
+3. `wrangler d1 migrations apply absolute-right-leaderboard --remote`
 4. `wrangler deploy`
 
 正式版本发布时，通常依赖同一个 `v*` tag push，让它和 CLI 一起进 CI。
@@ -91,7 +91,7 @@ git checkout main
 git pull --ff-only origin main
 git status -sb
 git tag --list 'v*' --sort=version:refname
-npm view maleme version
+npm view absolute-right version
 ```
 
 ## 正式发布流程
@@ -128,7 +128,7 @@ pnpm --dir web build
 
 ```bash
 cargo build --release
-node scripts/npm/stage-binary.mjs aarch64-apple-darwin target/release/maleme
+node scripts/npm/stage-binary.mjs aarch64-apple-darwin target/release/absolute-right
 npm pack ./npm/main
 ```
 

@@ -1,8 +1,8 @@
 import { env } from "cloudflare:workers";
 import type { LeaderboardReportPayload, Viewer } from "./types";
 
-const SESSION_COOKIE = "maleme_session";
-const PENDING_SUBMISSION_COOKIE = "maleme_pending_submission";
+const SESSION_COOKIE = "absolute_right_session";
+const PENDING_SUBMISSION_COOKIE = "absolute_right_pending_submission";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 const PENDING_SUBMISSION_MAX_AGE = 60 * 10;
 
@@ -119,7 +119,7 @@ export async function exchangeCodeForToken(requestUrl: URL, code: string) {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      "User-Agent": "maleme-leaderboard",
+      "User-Agent": "absolute-right-leaderboard",
     },
     body: JSON.stringify({
       client_id: env.GITHUB_CLIENT_ID,
@@ -150,7 +150,7 @@ export async function fetchGitHubUser(token: string) {
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: `Bearer ${token}`,
-      "User-Agent": "maleme-leaderboard",
+      "User-Agent": "absolute-right-leaderboard",
       "X-GitHub-Api-Version": "2022-11-28",
     },
   });
