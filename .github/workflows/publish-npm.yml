@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Release version or tag, for example v0.1.18"
+        required: true
 
 permissions:
   contents: read
@@ -58,7 +63,7 @@ jobs:
           sudo apt-get install -y musl-tools
 
       - name: Verify release tag
-        run: node scripts/npm/check-release-version.mjs "${GITHUB_REF_NAME}"
+        run: node scripts/npm/check-release-version.mjs "${{ inputs.release_version || github.ref_name }}"
 
       - name: Sync npm package versions
         run: node scripts/npm/sync-packages.mjs
@@ -87,7 +92,7 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Verify release tag
-        run: node scripts/npm/check-release-version.mjs "${GITHUB_REF_NAME}"
+        run: node scripts/npm/check-release-version.mjs "${{ inputs.release_version || github.ref_name }}"
 
       - name: Sync npm package versions
         run: node scripts/npm/sync-packages.mjs
