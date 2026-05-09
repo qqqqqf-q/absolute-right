@@ -1619,7 +1619,7 @@ fn leaderboard_submit_endpoint() -> String {
     std::env::var("ABSOLUTE_RIGHT_SUBMIT_ENDPOINT")
         .ok()
         .filter(|value| !value.trim().is_empty())
-        .unwrap_or_else(|| "https://leaderboard.absolute-right.dev/submit".to_owned())
+        .unwrap_or_else(|| "https://absolute-right-leaderboard.731052835.workers.dev/submit".to_owned())
 }
 
 fn report_headline(range_start: &str, range_end: &str, total_agreements: i64) -> String {
@@ -2118,7 +2118,7 @@ mod tests {
         assert!(html.contains("sbai-alert"));
         assert!(html.contains("彻底爆炸"));
                 assert!(html.contains("提交到 leaderboard 看看你的 AI 有多服你！"));
-        assert!(html.contains("https://leaderboard.absolute-right.dev/submit"));
+        assert!(html.contains("https://absolute-right-leaderboard.731052835.workers.dev/submit"));
         assert!(html.contains("name=\"reportPayload\""));
         assert!(html.contains("name=\"modelSbaiPayload\""));
         assert!(html.contains("\"modelSbai\""));

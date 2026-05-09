@@ -3,20 +3,14 @@
 	"name": "absolute-right-leaderboard",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"compatibility_date": "2026-04-13",
-	"workers_dev": false,
+	"workers_dev": true,
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist"
 	},
 	"vars": {
-		"APP_URL": "https://leaderboard.absolute-right.dev"
+		"APP_URL": "https://absolute-right-leaderboard.731052835.workers.dev"
 	},
-	"routes": [
-		{
-			"pattern": "leaderboard.absolute-right.dev",
-			"custom_domain": true
-		}
-	],
 	"observability": {
 		"enabled": true
 	},
@@ -24,7 +18,7 @@
 		{
 			"binding": "DB",
 			"database_name": "absolute-right-leaderboard",
-			"database_id": "REPLACE_WITH_D1_DATABASE_ID"
+			"database_id": "a16b9e3d-31fd-4f7b-b07b-8e076a6acc23"
 		}
 	]
 }
