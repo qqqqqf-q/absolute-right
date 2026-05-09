@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: "Release version or tag, for example v0.1.18"
+        description: "Release version or tag, for example v0.1.19"
         required: true
 
 permissions:
@@ -96,6 +96,9 @@ jobs:
 
       - name: Sync npm package versions
         run: node scripts/npm/sync-packages.mjs
+
+      - name: Stage npm README
+        run: cp README.md npm/main/README.md
 
       - name: Publish main package
         run: npm publish ./npm/main --access public --provenance

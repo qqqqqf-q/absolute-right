@@ -1,6 +1,6 @@
 {
   "name": "absolute-right",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Agreement analytics CLI for local coding-agent histories.",
   "license": "WTFPL",
   "type": "module",
@@ -18,10 +18,10 @@
     "url": "git+https://github.com/qqqqqf-q/absolute-right.git"
   },
   "optionalDependencies": {
-    "absolute-right-darwin-arm64": "0.1.18",
-    "absolute-right-darwin-x64": "0.1.18",
-    "absolute-right-linux-arm64": "0.1.18",
-    "absolute-right-linux-x64": "0.1.18",
-    "absolute-right-win32-x64": "0.1.18"
+    "absolute-right-darwin-arm64": "0.1.19",
+    "absolute-right-darwin-x64": "0.1.19",
+    "absolute-right-linux-arm64": "0.1.19",
+    "absolute-right-linux-x64": "0.1.19",
+    "absolute-right-win32-x64": "0.1.19"
   }
 }
